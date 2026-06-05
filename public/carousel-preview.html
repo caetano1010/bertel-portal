@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bertel | Visualizador de Carrossel Premium</title>
+  
+  <!-- Fontes Oficiais da Marca -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Lucide Icons via CDN para UI -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --preto:            #050505;
+      --grafite:          #191919;
+      --ouro-bertel:      #D4AF37;
+      --ouro-envelhecido: #A47C2C;
+      --offwhite:         #F2EDE3;
+      --cinza-concreto:   #777777;
+      
+      --grad-preto-grafite: linear-gradient(135deg, #050505, #191919);
+      --grad-ouro:          linear-gradient(135deg, #D4AF37, #A47C2C);
+      --grad-gold-light:    linear-gradient(135deg, #f8f0d4, #D4AF37);
+      --shadow-premium:     0 20px 40px rgba(0, 0, 0, 0.7);
+      --shadow-gold:        0 8px 32px rgba(212, 175, 55, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--preto);
+      color: var(--offwhite);
+      font-family: 'Manrope', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Header e Navegação do Visualizador */
+    header {
+      background: rgba(19, 19, 19, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 32px;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.15em;
+      color: var(--ouro-bertel);
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--cinza-concreto);
+      font-weight: 700;
+    }
+
+    .controls-section {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .view-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--cinza-concreto);
+      padding: 10px 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .view-btn.active {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--ouro-bertel);
+      color: var(--ouro-bertel);
+    }
+
+    .view-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--offwhite);
+    }
+
+    /* Container Principal */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .intro-section {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .intro-section h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--offwhite);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .intro-section p {
+      color: var(--cinza-concreto);
+      font-size: 14px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* VISUALIZAÇÃO EM GRADE (PRODUTORES / APRESENTAÇÃO) */
+    .grid-view-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      justify-content: center;
+    }
+
+    /* Componente da Lâmina (4:5 Ratio) */
+    .slide-card {
+      aspect-ratio: 4/5;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      background-color: #0b0b0b;
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: var(--shadow-premium);
+      display: flex;
+      flex-col: column;
+      justify-content: space-between;
+      padding: 28px;
+      user-select: none;
+    }
+
+    .slide-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-cover: cover;
+      object-position: center;
+      opacity: 0.65;
+      z-index: 1;
+      pointer-events: none;
+      transition: transform 0.5s ease;
+    }
+
+    .slide-card:hover .slide-background {
+      transform: scale(1.03);
+    }
+
+    .slide-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.65) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Header da Lâmina (Logo, Página, Dots) */
+    .slide-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .slide-number {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(212, 175, 55, 0.75);
+      letter-spacing: 0.18em;
+    }
+
+    .slide-logo {
+      height: 20px;
+      width: auto;
+    }
+
+    .slide-progress {
+      display: flex;
+      gap: 3px;
+    }
+
+    .progress-dot {
+      width: 3px;
+      height: 3px;
+      background: rgba(212, 175, 55, 0.25);
+      border-radius: 50%;
+    }
+
+    .progress-dot.active {
+      width: 10px;
+      background: var(--ouro-bertel);
+      border-radius: 2px;
+    }
+
+    /* Conteúdo da Lâmina (Textos) */
+    .slide-body {
+      position: relative;
+      z-index: 10;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .slide-accent {
+      width: 24px;
+      height: 2px;
+      background: var(--grad-ouro);
+      margin-bottom: 12px;
+    }
+
+    .slide-title {
+      color: var(--offwhite);
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+      margin-bottom: 12px;
+    }
+
+    .slide-title.cover {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .slide-title.content {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .slide-description {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #cccccc;
+      font-weight: 400;
+      max-width: 95%;
+    }
+
+    .slide-btn {
+      margin-top: 16px;
+      background: var(--grad-ouro);
+      color: #050505;
+      font-family: 'Manrope', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-gold);
+    }
+
+    /* VISUALIZAÇÃO INTERATIVA EM MOCKUP CELULAR */
+    .mobile-view-container {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 0;
+    }
+
+    .phone-shell {
+      width: 375px;
+      height: 760px;
+      background: #111111;
+      border: 12px solid #222222;
+      border-radius: 40px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Notch do celular */
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 20px;
+      background: #222222;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      z-index: 999;
+    }
+
+    .phone-status-bar {
+      height: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px 0;
+      font-size: 10px;
+      font-weight: 600;
+      color: #ffffff;
+      z-index: 50;
+      background: #000;
+    }
+
+    /* Interface de Visualização do Instagram */
+    .instagram-header {
+      background: #000;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      z-index: 50;
+    }
+
+    .ig-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--grad-ouro);
+      border: 1.5px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 14px;
+      color: #000;
+    }
+
+    .ig-user-info {
+      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ig-username {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .ig-location {
+      font-size: 9px;
+      color: #999999;
+    }
+
+    /* Slider interno */
+    .phone-slider-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      align-items: center;
+    }
+
+    .phone-slide-wrapper {
+      display: flex;
+      width: 500%;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .phone-slide-wrapper .slide-card {
+      width: 351px;
+      height: 438px;
+      border-radius: 0;
+      border: none;
+      padding: 20px;
+    }
+
+    .phone-slide-wrapper .slide-title.cover {
+      font-size: 22px;
+    }
+
+    .phone-slide-wrapper .slide-title.content {
+      font-size: 18px;
+    }
+
+    .phone-slide-wrapper .slide-description {
+      font-size: 12px;
+    }
+
+    /* Barra de Ações (Instagram Mockup) */
+    .instagram-actions {
+      background: #000;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ig-action-left {
+      display: flex;
+      gap: 16px;
+      color: #fff;
+    }
+
+    .ig-dots-indicator {
+      display: flex;
+      gap: 4px;
+    }
+
+    .ig-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #555555;
+    }
+
+    .ig-dot.active {
+      background: #3897f0;
+    }
+
+    /* Botões de Navegação Celular */
+    .phone-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .phone-nav-btn:hover {
+      background: var(--ouro-bertel);
+      color: #000;
+      border-color: var(--ouro-bertel);
+    }
+
+    .phone-nav-prev { left: 8px; }
+    .phone-nav-next { right: 8px; }
+
+    /* Guideline Overlay (Instagram Overlay Option) */
+    .ig-ui-overlay {
+      position: absolute;
+      inset: 0;
+      border: 1px dashed rgba(212, 175, 55, 0.4);
+      z-index: 30;
+      pointer-events: none;
+      display: none;
+    }
+
+    .ig-ui-overlay::before {
+      content: 'ZONA SEGURA INSTAGRAM (1080x1350)';
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--ouro-bertel);
+      background: rgba(0,0,0,0.8);
+      padding: 2px 6px;
+    }
+
+    .grid-label {
+      background: rgba(19, 19, 19, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cinza-concreto);
+      margin-top: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="ig-avatar">B</div>
+        <div>
+          <div class="brand-title">Bertel</div>
+          <div class="brand-subtitle">Reformas e Construções</div>
+        </div>
+      </div>
+      
+      <div class="controls-section">
+        <button id="btn-grid" class="view-btn active" onclick="switchView('grid')">
+          <i data-lucide="layout-grid"></i> Grade
+        </button>
+        <button id="btn-mobile" class="view-btn" onclick="switchView('mobile')">
+          <i data-lucide="smartphone"></i> Simulador
+        </button>
+        <button id="btn-safe" class="view-btn" onclick="toggleSafeZone()">
+          <i data-lucide="shield-alert"></i> Linhas Guias
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Principal -->
+  <main>
+    <div class="intro-section">
+      <h1 id="carousel-date">Lançamento: 05 de Junho</h1>
+      <p id="carousel-desc">4 informações essenciais que todo cliente deve separar antes de solicitar um orçamento técnico.</p>
+    </div>
+
+    <!-- GRADE VIEW (LADO A LADO) -->
+    <div id="grid-container" class="grid-view-container">
+      <!-- Slide 1 (Capa) -->
+      <div>
+        <div class="slide-card">
+          <img src="assets-05-06/cena-1.png" alt="Fundo Lâmina 1" class="slide-background">
+          <div class="slide-gradient"></div>
+          
+          <div class="slide-header">
+            <span class="slide-number">01 / 05</span>
+            <img src="logo_transparent.png" alt="Logo Bertel" class="slide-logo">
+            <div class="slide-progress">
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+          
+          <div class="slide-body">
+            <div class="slide-accent"></div>
+            <h2 class="slide-title cover">Vai pedir orçamento de reforma?</h2>
+            <p class="slide-description">Separe isso antes para evitar surpresas no preço e no prazo comercial.</p>
+          </div>
+        </div>
+        <div class="grid-label">Lâmina 1: Capa (Uniforme Preto)</div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div>
+        <div class="slide-card">
+          <img src="assets-05-06/cena-2.png" alt="Fundo Lâmina 2" class="slide-background">
+          <div class="slide-gradient"></div>
+          
+          <div class="slide-header">
+            <span class="slide-number">02 / 05</span>
+            <img src="logo_transparent.png" alt="Logo Bertel" class="slide-logo">
+            <div class="slide-progress">
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+          
+          <div class="slide-body">
+            <div class="slide-accent"></div>
+            <h2 class="slide-title content">1 Fotos do ambiente</h2>
+            <p class="slide-description">Mostre o local como está hoje. Registre paredes, teto, piso, pontos de tomada e detalhes de desgaste.</p>
+          </div>
+        </div>
+        <div class="grid-label">Lâmina 2: Fotos do Ambiente</div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div>
+        <div class="slide-card">
+          <img src="assets-05-06/cena-3.png" alt="Fundo Lâmina 3" class="slide-background">
+          <div class="slide-gradient"></div>
+          
+          <div class="slide-header">
+            <span class="slide-number">03 / 05</span>
+            <img src="logo_transparent.png" alt="Logo Bertel" class="slide-logo">
+            <div class="slide-progress">
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+          
+          <div class="slide-body">
+            <div class="slide-accent"></div>
+            <h2 class="slide-title content">2 Medidas aproximadas</h2>
+            <p class="slide-description">Largura, altura e área estimadas ajudam a calcular a escala e agilizar o orçamento técnico.</p>
+          </div>
+        </div>
+        <div class="grid-label">Lâmina 3: Medidas Aproximadas</div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div>
+        <div class="slide-card">
+          <img src="assets-05-06/cena-4.png" alt="Fundo Lâmina 4" class="slide-background">
+          <div class="slide-gradient"></div>
+          
+          <div class="slide-header">
+            <span class="slide-number">04 / 05</span>
+            <img src="logo_transparent.png" alt="Logo Bertel" class="slide-logo">
+            <div class="slide-progress">
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+          
+          <div class="slide-body">
+            <div class="slide-accent"></div>
+            <h2 class="slide-title content">3 O que precisa ser feito</h2>
+            <p class="slide-description">Pintura, reforma, revestimento, elétrica ou acabamento? Nomear o serviço evita conversas vagas.</p>
+          </div>
+        </div>
+        <div class="grid-label">Lâmina 4: Serviço & Escopo</div>
+      </div>
+
+      <!-- Slide 5 -->
+      <div>
+        <div class="slide-card">
+          <img src="assets-05-06/cena-5.png" alt="Fundo Lâmina 5" class="slide-background">
+          <div class="slide-gradient"></div>
+          
+          <div class="slide-header">
+            <span class="slide-number">05 / 05</span>
+            <img src="logo_transparent.png" alt="Logo Bertel" class="slide-logo">
+            <div class="slide-progress">
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+            </div>
+          </div>
+          
+          <div class="slide-body">
+            <div class="slide-accent"></div>
+            <h2 class="slide-title content">4 O resultado esperado</h2>
+            <p class="slide-description">Defina se o objetivo é renovar, reparar, valorizar ou preparar o espaço para uso.</p>
+            <button class="slide-btn">
+              <i data-lucide="message-square-more" style="width: 14px; height: 14px;"></i>
+              Chamar no WhatsApp
+            </button>
+          </div>
+        </div>
+        <div class="grid-label">Lâmina 5: CTA final</div>
+      </div>
+    </div>
+
+    <!-- INTERATIVE MOBILE SIMULATOR -->
+    <div id="mobile-container" class="mobile-view-container">
+      <div class="phone-shell">
+        <div class="phone-notch"></div>
+        <div class="phone-status-bar">
+          <span>18:50</span>
+          <div style="display: flex; gap: 4px;">
+            <i data-lucide="signal" style="width: 10px; height: 10px;"></i>
+            <i data-lucide="wifi" style="width: 10px; height: 10px;"></i>
+            <i data-lucide="battery" style="width: 10px; height: 10px;"></i>
+          </div>
+        </div>
+        
+        <!-- Instagram Header -->
+        <div class="instagram-header">
+          <div class="ig-avatar">B</div>
+          <div class="ig-user-info">
+            <span class="ig-username">bertelreformas</span>
+            <span class="ig-location">Vale do Itajaí / SC</span>
+          </div>
+        </div>
+
+        <!-- Carrossel Wrapper -->
+        <div class="phone-slider-container">
+          <div id="safe-guide-line" class="ig-ui-overlay"></div>
+          
+          <div id="phone-nav-prev" class="phone-nav-btn phone-nav-prev" onclick="slideMobile(-1)">
+            <i data-lucide="chevron-left"></i>
+          </div>
+          <div id="phone-nav-next" class="phone-nav-btn phone-nav-next" onclick="slideMobile(1)">
+            <i data-lucide="chevron-right"></i>
+          </div>
+
+          <div id="slider-wrapper" class="phone-slide-wrapper">
+            <!-- Slide 1 -->
+            <div class="slide-card">
+              <img src="assets-05-06/cena-1.png" class="slide-background">
+              <div class="slide-gradient"></div>
+              <div class="slide-header">
+                <span class="slide-number">01 / 05</span>
+                <img src="logo_transparent.png" class="slide-logo">
+                <div class="slide-progress">
+                  <div class="progress-dot active"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                </div>
+              </div>
+              <div class="slide-body">
+                <div class="slide-accent"></div>
+                <h2 class="slide-title cover">Vai pedir orçamento de reforma?</h2>
+                <p class="slide-description">Separe isso antes para evitar surpresas no preço e no prazo comercial.</p>
+              </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide-card">
+              <img src="assets-05-06/cena-2.png" class="slide-background">
+              <div class="slide-gradient"></div>
+              <div class="slide-header">
+                <span class="slide-number">02 / 05</span>
+                <img src="logo_transparent.png" class="slide-logo">
+                <div class="slide-progress">
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot active"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                </div>
+              </div>
+              <div class="slide-body">
+                <div class="slide-accent"></div>
+                <h2 class="slide-title content">1 Fotos do ambiente</h2>
+                <p class="slide-description">Mostre o local como está hoje. Registre paredes, teto, piso, pontos de tomada e detalhes de desgaste.</p>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide-card">
+              <img src="assets-05-06/cena-3.png" class="slide-background">
+              <div class="slide-gradient"></div>
+              <div class="slide-header">
+                <span class="slide-number">03 / 05</span>
+                <img src="logo_transparent.png" class="slide-logo">
+                <div class="slide-progress">
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot active"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                </div>
+              </div>
+              <div class="slide-body">
+                <div class="slide-accent"></div>
+                <h2 class="slide-title content">2 Medidas aproximadas</h2>
+                <p class="slide-description">Largura, altura e área estimadas ajudam a calcular a escala e agilizar o orçamento técnico.</p>
+              </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide-card">
+              <img src="assets-05-06/cena-4.png" class="slide-background">
+              <div class="slide-gradient"></div>
+              <div class="slide-header">
+                <span class="slide-number">04 / 05</span>
+                <img src="logo_transparent.png" class="slide-logo">
+                <div class="slide-progress">
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot active"></div>
+                  <div class="progress-dot"></div>
+                </div>
+              </div>
+              <div class="slide-body">
+                <div class="slide-accent"></div>
+                <h2 class="slide-title content">3 O que precisa ser feito</h2>
+                <p class="slide-description">Pintura, reforma, revestimento, elétrica ou acabamento? Nomear o serviço evita conversas vagas.</p>
+              </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide-card">
+              <img src="assets-05-06/cena-5.png" class="slide-background">
+              <div class="slide-gradient"></div>
+              <div class="slide-header">
+                <span class="slide-number">05 / 05</span>
+                <img src="logo_transparent.png" class="slide-logo">
+                <div class="slide-progress">
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot"></div>
+                  <div class="progress-dot active"></div>
+                </div>
+              </div>
+              <div class="slide-body">
+                <div class="slide-accent"></div>
+                <h2 class="slide-title content">4 O resultado esperado</h2>
+                <p class="slide-description">Defina se o objetivo é renovar, reparar, valorizar ou preparar o espaço para uso.</p>
+                <button class="slide-btn">
+                  <i data-lucide="message-square-more" style="width: 14px; height: 14px;"></i>
+                  WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instagram Actions Footer -->
+        <div class="instagram-actions">
+          <div class="ig-action-left">
+            <i data-lucide="heart"></i>
+            <i data-lucide="message-circle"></i>
+            <i data-lucide="send"></i>
+          </div>
+          
+          <div class="ig-dots-indicator">
+            <div class="ig-dot active" id="ig-dot-0"></div>
+            <div class="ig-dot" id="ig-dot-1"></div>
+            <div class="ig-dot" id="ig-dot-2"></div>
+            <div class="ig-dot" id="ig-dot-3"></div>
+            <div class="ig-dot" id="ig-dot-4"></div>
+          </div>
+          
+          <div style="color: #fff;">
+            <i data-lucide="bookmark"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Inicializa Lucide Icons
+    lucide.createIcons();
+
+    let activeMobileIndex = 0;
+    const totalSlides = 5;
+
+    function switchView(mode) {
+      const grid = document.getElementById('grid-container');
+      const mobile = document.getElementById('mobile-container');
+      const btnGrid = document.getElementById('btn-grid');
+      const btnMobile = document.getElementById('btn-mobile');
+
+      if (mode === 'grid') {
+        grid.style.display = 'grid';
+        mobile.style.display = 'none';
+        btnGrid.classList.add('active');
+        btnMobile.classList.remove('active');
+      } else {
+        grid.style.display = 'none';
+        mobile.style.display = 'flex';
+        btnGrid.classList.remove('active');
+        btnMobile.classList.add('active');
+        updateMobileSlider();
+      }
+    }
+
+    function toggleSafeZone() {
+      const btn = document.getElementById('btn-safe');
+      const guides = document.getElementById('safe-guide-line');
+      
+      if (guides.style.display === 'block') {
+        guides.style.display = 'none';
+        btn.classList.remove('active');
+      } else {
+        guides.style.display = 'block';
+        btn.classList.add('active');
+      }
+    }
+
+    function slideMobile(direction) {
+      activeMobileIndex += direction;
+      if (activeMobileIndex < 0) activeMobileIndex = 0;
+      if (activeMobileIndex >= totalSlides) activeMobileIndex = totalSlides - 1;
+      updateMobileSlider();
+    }
+
+    function updateMobileSlider() {
+      const wrapper = document.getElementById('slider-wrapper');
+      const offset = activeMobileIndex * -351; // Largura do slide interno do mockup
+      wrapper.style.transform = `translateX(${offset}px)`;
+
+      // Atualiza os dots do Instagram
+      for (let i = 0; i < totalSlides; i++) {
+        const dot = document.getElementById(`ig-dot-${i}`);
+        if (i === activeMobileIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      }
+
+      // Desabilita botões nas pontas
+      document.getElementById('phone-nav-prev').style.opacity = activeMobileIndex === 0 ? '0.3' : '1';
+      document.getElementById('phone-nav-next').style.opacity = activeMobileIndex === totalSlides - 1 ? '0.3' : '1';
+    }
+  </script>
+</body>
+</html>
