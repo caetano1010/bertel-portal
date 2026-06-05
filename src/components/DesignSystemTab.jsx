@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Download } from 'lucide-react';
 
 export default function DesignSystemTab() {
   const iframeRef = useRef(null);
@@ -119,10 +120,16 @@ export default function DesignSystemTab() {
                   grid-column: span 1 !important;
                 }
                 
-                /* Limita largura do mockup no celular para não quebrar proporção */
+                /* Limita largura do mockup no celular para não quebrar proporção e evita colapso */
                 .fmt-frame {
+                  width: 100% !important;
                   max-width: 220px !important;
                   margin: 0 auto !important;
+                }
+                
+                #tab-antesdepois > div {
+                  grid-template-columns: 1fr !important;
+                  gap: 24px !important;
                 }
                 
                 .space-grid {
@@ -155,8 +162,36 @@ export default function DesignSystemTab() {
     };
   }, []);
 
+  const handleDownloadHTML = () => {
+    const a = document.createElement('a');
+    a.href = './brand-system/bertel-design-system.html';
+    a.download = 'bertel-design-system.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
-    <div className="w-full max-w-7xl mx-auto py-2 md:py-6 animate-fadeIn">
+    <div className="w-full max-w-7xl mx-auto py-2 md:py-6 animate-fadeIn flex flex-col gap-4">
+      {/* Header com Botão de Download */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-zinc-950/40 border border-white/[0.04] p-4 rounded-2xl">
+        <div>
+          <h2 className="font-cinzel text-lg md:text-xl font-bold tracking-wider text-offwhite">
+            Design System & Mockups Interativos
+          </h2>
+          <p className="text-zinc-500 text-xs mt-1 font-sans">
+            Guia de diretrizes de marca, paleta de cores, tipografia e especificações de formatos da Bertel.
+          </p>
+        </div>
+        <button
+          onClick={handleDownloadHTML}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-grafite-card hover:bg-ouro-bertel border border-white/[0.06] hover:border-ouro-bertel text-cinza-concreto hover:text-preto rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md cursor-pointer whitespace-nowrap"
+        >
+          <Download size={14} />
+          Baixar HTML
+        </button>
+      </div>
+
       <div className="w-full rounded-2xl overflow-hidden border border-white/[0.04] bg-zinc-950/45 shadow-premium">
         <iframe 
           ref={iframeRef}

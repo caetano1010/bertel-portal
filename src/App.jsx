@@ -5,6 +5,7 @@ import MediaViewer from './components/MediaViewer';
 import CaptionBox from './components/CaptionBox';
 import PlanningTab from './components/PlanningTab';
 import DesignSystemTab from './components/DesignSystemTab';
+import OnboardingGuide from './components/OnboardingGuide';
 import initialDeliveries from './data/deliveries.json';
 
 export default function App() {
@@ -59,6 +60,9 @@ export default function App() {
                   {activeDelivery.date} • Formato: {activeDelivery.type}
                 </div>
               </div>
+
+              {/* Guia de Onboarding / Instruções */}
+              <OnboardingGuide />
 
               {/* Grid Principal de Conteúdo */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
