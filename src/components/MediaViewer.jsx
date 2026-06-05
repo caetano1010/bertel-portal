@@ -97,13 +97,13 @@ export default function MediaViewer({ delivery }) {
         <div className={`flex flex-col gap-3 ${isReels ? (activeTab === 'content' ? 'flex' : 'hidden md:flex') : 'flex'}`}>
           {isReels ? (
             /* PLAYER DE VÍDEO REELS 9:16 (MOCKUP CELULAR) */
-            <div className="relative aspect-[9/16] border-[6px] border-zinc-800 rounded-[32px] overflow-hidden bg-black shadow-card border-ouro-bertel/20">
+            <div className="relative aspect-[9/16] w-full max-w-[320px] mx-auto border-[6px] border-zinc-800 rounded-[32px] overflow-hidden bg-black shadow-card border-ouro-bertel/20">
               {/* Notch de celular */}
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-3.5 bg-zinc-800 rounded-full z-10"></div>
               <video
                 controls
                 poster={delivery.coverUrl}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 key={delivery.videoUrl} // Força recarregar ao trocar
               >
                 <source src={delivery.videoUrl} type="video/mp4" />
