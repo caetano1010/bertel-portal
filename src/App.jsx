@@ -10,8 +10,33 @@ import initialDeliveries from './data/deliveries.json';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('approval');
-  const [deliveries, setDeliveries] = useState(initialDeliveries);
-  const [activeDeliveryId, setActiveDeliveryId] = useState(initialDeliveries[0].id);
+  
+  // Carrega status salvo ou usa o do JSON
+  const [deliveries, setDeliveries] = useState(() => {
+    const saved = localStorage.getItem('bertel_deliveries_status');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return initialDeliveries.map(item => ({
+          ...item,
+          status: parsed[item.id] || item.status
+        }));
+      } catch (e) {
+        console.error('Erro ao ler status do localStorage:', e);
+      }
+    }
+    return initialDeliveries;
+  });
+
+  // Carrega post ativo salvo ou usa o primeiro
+  const [activeDeliveryId, setActiveDeliveryId] = useState(() => {
+    const savedId = localStorage.getItem('bertel_active_delivery_id');
+    if (savedId && initialDeliveries.some(d => d.id === savedId)) {
+      return savedId;
+    }
+    return initialDeliveries[0].id;
+  });
+
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
 
@@ -27,14 +52,30 @@ export default function App() {
     }, 3000);
   };
 
-  // Atualiza o status local de aprovação
+  // Salva a seleção do post no localStorage
+  const handleSelectDelivery = (id) => {
+    setActiveDeliveryId(id);
+    localStorage.setItem('bertel_active_delivery_id', id);
+  };
+
+  // Atualiza o status local de aprovação e persiste no localStorage
   const handleUpdateStatus = (id, newStatus) => {
-    setDeliveries(prev => prev.map(item => {
-      if (item.id === id) {
-        return { ...item, status: newStatus };
-      }
-      return item;
-    }));
+    setDeliveries(prev => {
+      const updated = prev.map(item => {
+        if (item.id === id) {
+          return { ...item, status: newStatus };
+        }
+        return item;
+      });
+      
+      const statuses = {};
+      updated.forEach(item => {
+        statuses[item.id] = item.status;
+      });
+      localStorage.setItem('bertel_deliveries_status', JSON.stringify(statuses));
+      
+      return updated;
+    });
   };
 
   const renderContent = () => {
@@ -46,7 +87,7 @@ export default function App() {
             <Sidebar 
               deliveries={deliveries} 
               activeDelivery={activeDelivery} 
-              onSelectDelivery={setActiveDeliveryId} 
+              onSelectDelivery={handleSelectDelivery} 
             />
 
             {/* Painel Central do Conteúdo do Post */}
