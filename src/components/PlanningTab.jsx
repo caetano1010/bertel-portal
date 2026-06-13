@@ -16,6 +16,14 @@ export default function PlanningTab() {
   };
 
   const getStatusBadge = (status) => {
+    if (status === 'Aprovado' || status === 'approved') {
+      return (
+        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950/40 text-emerald-400 border border-emerald-500/20 w-fit">
+          <CheckCircle2 size={10} className="text-emerald-400" />
+          Aprovado
+        </span>
+      );
+    }
     if (status === 'Pronto para Aprovação') {
       return (
         <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-950/40 text-amber-400 border border-amber-500/20 w-fit">
