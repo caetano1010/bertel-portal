@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckSquare, Calendar, Palette } from 'lucide-react';
 
 export default function Navbar({ activeTab, onTabChange, status }) {

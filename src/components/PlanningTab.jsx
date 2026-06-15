@@ -1,6 +1,5 @@
-import React from 'react';
 import planningData from '../data/planning.json';
-import { Calendar, Video, FileText, CheckCircle2, Circle } from 'lucide-react';
+import { Video, FileText, CheckCircle2, Circle } from 'lucide-react';
 
 export default function PlanningTab() {
   

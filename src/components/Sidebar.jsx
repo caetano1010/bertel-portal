@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Calendar, CheckCircle2, Clock, HelpCircle, AlertCircle, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, CheckCircle2, Clock, AlertCircle, ChevronDown } from 'lucide-react';
 
 export default function Sidebar({ deliveries, activeDelivery, onSelectDelivery }) {
   const [isOpen, setIsOpen] = useState(false);

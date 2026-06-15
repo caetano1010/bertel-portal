@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Copy, Download, Check, AlertTriangle, Send } from 'lucide-react';
 
 export default function CaptionBox({ delivery, onUpdateStatus, onShowToast }) {

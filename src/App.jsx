@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import MediaViewer from './components/MediaViewer';
@@ -108,7 +108,7 @@ export default function App() {
               {/* Grid Principal de Conteúdo */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
                 {/* Lado Esquerdo: Capa e Vídeo/Carrossel */}
-                <MediaViewer delivery={activeDelivery} />
+                <MediaViewer key={activeDelivery.id} delivery={activeDelivery} />
 
                 {/* Lado Direito: Legenda e Ações de Aprovação */}
                 <CaptionBox 

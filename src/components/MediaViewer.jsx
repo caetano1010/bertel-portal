@@ -1,27 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Video, ChevronLeft, ChevronRight, Image as ImageIcon, Download } from 'lucide-react';
 
 export default function MediaViewer({ delivery }) {
   const [activeTab, setActiveTab] = useState(delivery.type === 'reels' ? 'cover' : 'content'); // 'cover' | 'content'
   const [slideIndex, setSlideIndex] = useState(0);
-
-  // Reseta estados quando muda de post
-  useEffect(() => {
-    setActiveTab(delivery.type === 'reels' ? 'cover' : 'content');
-    setSlideIndex(0);
-  }, [delivery]);
+  const isReels = delivery.type === 'reels';
+  const slides = Array.isArray(delivery.slides) ? delivery.slides : [];
+  const hasSlides = slides.length > 0;
+  const hasSingleImage = !isReels && !hasSlides && Boolean(delivery.coverUrl);
 
   const handlePrevSlide = () => {
-    setSlideIndex((prev) => (prev > 0 ? prev - 1 : delivery.slides.length - 1));
+    if (!hasSlides) return;
+    setSlideIndex((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
   };
 
   const handleNextSlide = () => {
-    setSlideIndex((prev) => (prev < delivery.slides.length - 1 ? prev + 1 : 0));
+    if (!hasSlides) return;
+    setSlideIndex((prev) => (prev < slides.length - 1 ? prev + 1 : 0));
   };
 
   const handleDownloadCurrent = () => {
-    const url = delivery.slides[slideIndex];
+    const url = slides[slideIndex];
+    if (!url) return;
     const a = document.createElement('a');
     a.href = url;
     a.download = `slide-${slideIndex + 1}.png`;
@@ -31,7 +32,7 @@ export default function MediaViewer({ delivery }) {
   };
 
   const handleDownloadAll = () => {
-    delivery.slides.forEach((url, idx) => {
+    slides.forEach((url, idx) => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `slide-${idx + 1}.png`;
@@ -42,8 +43,6 @@ export default function MediaViewer({ delivery }) {
       }, idx * 250);
     });
   };
-
-  const isReels = delivery.type === 'reels';
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -108,6 +107,14 @@ export default function MediaViewer({ delivery }) {
                 Seu navegador não suporta vídeos HTML5.
               </video>
             </div>
+          ) : hasSingleImage ? (
+            <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden border border-white/[0.06] shadow-card bg-black">
+              <img
+                src={delivery.coverUrl}
+                alt={`Imagem do post ${delivery.title}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
           ) : (
             /* SLIDER DE CARROSSEL 4:5 */
             <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden border border-white/[0.06] shadow-card bg-black">
@@ -122,16 +129,16 @@ export default function MediaViewer({ delivery }) {
                     transition={{ duration: 0.3 }}
                     className="w-full h-full absolute inset-0"
                   >
-                    {typeof delivery.slides[slideIndex] === 'string' ? (
+                    {typeof slides[slideIndex] === 'string' ? (
                       <img
-                        src={delivery.slides[slideIndex]}
+                        src={slides[slideIndex]}
                         alt={`Lâmina ${slideIndex + 1}`}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       /* RENDER DE LÂMINA HÍBRIDA 4:5 EM HTML/CSS */
                       (() => {
-                        const slide = delivery.slides[slideIndex];
+                        const slide = slides[slideIndex];
                         const parseHighlightText = (text, highlightClass = "text-ouro-bertel font-bold") => {
                           if (!text) return "";
                           const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -146,6 +153,13 @@ export default function MediaViewer({ delivery }) {
                             return part;
                           });
                         };
+                        if (!slide) {
+                          return (
+                            <div className="relative w-full h-full bg-zinc-950 flex items-center justify-center p-8 text-center text-cinza-concreto text-xs uppercase tracking-widest">
+                              Midia indisponivel
+                            </div>
+                          );
+                        }
                         return (
                           <div className="relative w-full h-full bg-zinc-950 flex flex-col justify-between p-5 md:p-8 select-none overflow-hidden">
                             {/* Fundo da imagem (limpa, sem textos) */}
@@ -176,7 +190,7 @@ export default function MediaViewer({ delivery }) {
 
                               {/* Progresso de Dots no Topo Direito */}
                               <div className="flex gap-[3px] absolute right-0" style={{ top: '22px' }}>
-                                {delivery.slides.map((_, idx) => (
+                                {slides.map((_, idx) => (
                                   <div
                                     key={idx}
                                     className={`h-[3px] rounded-full transition-all duration-300 ${idx === slideIndex ? 'bg-ouro-bertel w-[10px]' : 'bg-ouro-bertel/25 w-[3px]'
@@ -240,9 +254,9 @@ export default function MediaViewer({ delivery }) {
                 </button>
 
                 {/* Dots indicadores inferiores - Exibidos apenas se os slides forem strings (legado) */}
-                {typeof delivery.slides[0] === 'string' && (
+                {typeof slides[0] === 'string' && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
-                    {delivery.slides.map((_, idx) => (
+                    {slides.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setSlideIndex(idx)}
@@ -256,9 +270,9 @@ export default function MediaViewer({ delivery }) {
             </div>
           )}
           <span className="text-[10px] uppercase tracking-widest text-cinza-concreto text-center" id="media-label">
-            {isReels ? 'Vídeo do Reels (9:16)' : `Lâmina ${slideIndex + 1} de ${delivery.slides.length}`}
+            {isReels ? 'Vídeo do Reels (9:16)' : hasSlides ? `Lâmina ${slideIndex + 1} de ${slides.length}` : 'Imagem do Feed'}
           </span>
-          {!isReels && delivery.slides && delivery.slides.length > 0 && (
+          {!isReels && hasSlides && (
             <div className="flex justify-center gap-3 mt-3 w-full">
               <button
                 onClick={handleDownloadCurrent}
