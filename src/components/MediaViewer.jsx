@@ -52,22 +52,20 @@ export default function MediaViewer({ delivery }) {
         <div className="grid grid-cols-2 gap-2 md:hidden">
           <button
             onClick={() => setActiveTab('cover')}
-            className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 border ${
-              activeTab === 'cover'
+            className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 border ${activeTab === 'cover'
                 ? 'bg-ouro-bertel/10 border-ouro-bertel text-ouro-bertel'
                 : 'bg-grafite-card border-white/[0.06] text-cinza-concreto'
-            }`}
+              }`}
           >
             <Eye size={16} />
             Ver Capa
           </button>
           <button
             onClick={() => setActiveTab('content')}
-            className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 border ${
-              activeTab === 'content'
+            className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 border ${activeTab === 'content'
                 ? 'bg-ouro-bertel/10 border-ouro-bertel text-ouro-bertel'
                 : 'bg-grafite-card border-white/[0.06] text-cinza-concreto'
-            }`}
+              }`}
           >
             {isReels ? <Video size={16} /> : <ImageIcon size={16} />}
             {isReels ? 'Ver Vídeo' : 'Ver Carrossel'}
@@ -152,22 +150,22 @@ export default function MediaViewer({ delivery }) {
                           <div className="relative w-full h-full bg-zinc-950 flex flex-col justify-between p-5 md:p-8 select-none overflow-hidden">
                             {/* Fundo da imagem (limpa, sem textos) */}
                             {slide.backgroundUrl && (
-                              <img 
-                                src={slide.backgroundUrl} 
-                                alt={`Fundo Lâmina ${slideIndex + 1}`} 
+                              <img
+                                src={slide.backgroundUrl}
+                                alt={`Fundo Lâmina ${slideIndex + 1}`}
                                 className="absolute inset-0 w-full h-full object-cover opacity-55 z-0"
                               />
                             )}
-                            
+
                             {/* Camada gradiente para aumentar o contraste do texto */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/60 z-10" />
 
                             {/* Header (Logo + Progresso) */}
                             <div className="relative z-20 flex justify-between items-center w-full" style={{ minHeight: '32px' }}>
                               {/* Logo Centralizada */}
-                              <img 
-                                src="./logo_transparent.png" 
-                                alt="Logo Bertel" 
+                              <img
+                                src="./logo_transparent.png"
+                                alt="Logo Bertel"
                                 className="absolute left-1/2 -translate-x-1/2 h-[22px] w-auto"
                                 style={{ top: '18px' }}
                                 onError={(e) => {
@@ -179,11 +177,10 @@ export default function MediaViewer({ delivery }) {
                               {/* Progresso de Dots no Topo Direito */}
                               <div className="flex gap-[3px] absolute right-0" style={{ top: '22px' }}>
                                 {delivery.slides.map((_, idx) => (
-                                  <div 
+                                  <div
                                     key={idx}
-                                    className={`h-[3px] rounded-full transition-all duration-300 ${
-                                      idx === slideIndex ? 'bg-ouro-bertel w-[10px]' : 'bg-ouro-bertel/25 w-[3px]'
-                                    }`}
+                                    className={`h-[3px] rounded-full transition-all duration-300 ${idx === slideIndex ? 'bg-ouro-bertel w-[10px]' : 'bg-ouro-bertel/25 w-[3px]'
+                                      }`}
                                   />
                                 ))}
                               </div>
@@ -193,13 +190,12 @@ export default function MediaViewer({ delivery }) {
                             <div className="relative z-20 mt-auto flex flex-col items-start text-left w-full max-w-[90%] pb-8 md:pb-12">
                               {/* Accent Bar */}
                               <div className="w-6 h-[2px] bg-gradient-to-r from-ouro-bertel to-ouro-envelhecido mb-3" />
-                              
+
                               {/* Headline */}
-                              <h2 className={`text-offwhite leading-tight tracking-wide ${
-                                slide.isCover 
-                                  ? "font-serif text-2xl md:text-3xl italic font-normal" 
+                              <h2 className={`text-offwhite leading-tight tracking-wide ${slide.isCover
+                                  ? "font-serif text-2xl md:text-3xl italic font-normal"
                                   : "font-manrope text-xl md:text-2xl font-bold"
-                              }`}>
+                                }`}>
                                 {parseHighlightText(slide.title)}
                               </h2>
 
@@ -212,7 +208,7 @@ export default function MediaViewer({ delivery }) {
 
                               {/* Botão de CTA para o WhatsApp no último slide */}
                               {slide.isCta && (
-                                <a 
+                                <a
                                   href={`https://wa.me/5524992758683?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20de%20reforma.`}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -250,9 +246,8 @@ export default function MediaViewer({ delivery }) {
                       <button
                         key={idx}
                         onClick={() => setSlideIndex(idx)}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          idx === slideIndex ? 'bg-ouro-bertel w-5' : 'bg-white/40 w-2'
-                        }`}
+                        className={`h-2 rounded-full transition-all duration-300 ${idx === slideIndex ? 'bg-ouro-bertel w-5' : 'bg-white/40 w-2'
+                          }`}
                       ></button>
                     ))}
                   </div>
